@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Parcel Sandbox</title>
+    <meta charset="UTF-8" />
+    <script defer src="skate.js" type="module"></script>
+    <link rel="stylesheet" href="src/skate.css" />
+  </head>
+
+  <body>
+    <div id="listSelector">
+        <h2>Choose your list</h2>
+        <ul>
+            <li>
+                <label for="groove-grinds">
+                    <input type="checkbox" name="groove-grinds" id="groove-grinds" checked>
+                    Groove Grinds
+                </label>
+            </li>
+            <li>
+                <label for="soul-grinds">
+                    <input type="checkbox" name="soul-grinds" id="soul-grinds" checked>
+                    Soul Grinds
+                </label>
+            </li>
+            <li>
+                <label for="special-name-grinds">
+                    <input type="checkbox" name="special-name-grinds" id="special-name-grinds" checked>
+                    Special Name Grinds
+                </label>
+            </li>
+        </ul>
+    </div>
+    <div id="wheelOfFortune">
+      <canvas id="wheel" width="600" height="600"></canvas>
+      <div id="spin">SPIN</div>
+    </div>
+  </body>
+</html>
