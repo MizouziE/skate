@@ -199,14 +199,94 @@ header h1 {
   font-weight: 800;
   letter-spacing: 0.04em;
   text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
   transition: max-height 0.35s ease, opacity 0.3s ease, padding 0.35s ease;
   pointer-events: none;
 }
 
 #result.visible {
-  max-height: 80px;
+  max-height: 120px;
   opacity: 1;
-  padding: 14px 20px;
+  padding: 14px 16px;
+  pointer-events: auto;
+}
+
+#result-text {
+  flex: 1;
+  min-width: 0;
+}
+
+#result-skip {
+  background: transparent;
+  border: 2px solid currentColor;
+  color: inherit;
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  -webkit-tap-highlight-color: transparent;
+  transition: opacity 0.15s;
+}
+
+#result-skip:active {
+  opacity: 0.6;
+}
+
+/* Reshuffle button */
+#reshuffle {
+  background: transparent;
+  border: 1px solid #444;
+  color: #888;
+  border-radius: 20px;
+  padding: 10px 28px;
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+#reshuffle:active {
+  color: #ccc;
+  border-color: #666;
+}
+
+/* Session history */
+#history {
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  flex-direction: row;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  scrollbar-width: none;
+}
+
+#history::-webkit-scrollbar {
+  display: none;
+}
+
+.history-item {
+  padding: 6px 12px;
+  border-radius: 16px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  white-space: nowrap;
+  flex-shrink: 0;
+  letter-spacing: 0.03em;
 }
 
 @keyframes fadeUp {

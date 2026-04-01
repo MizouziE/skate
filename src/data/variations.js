@@ -28,7 +28,7 @@ export const variations = [
       "label": "Farside"
     },
     {
-      "color": "#44e40",
+      "color": "#044e40",
       "label": "Full Cab"
     },
     {
@@ -64,7 +64,7 @@ export const variations = [
       "label": "Step"
     },
     {
-      "color": "#d8b0b",
+      "color": "#d8b00b",
       "label": "Switch"
     },
     {

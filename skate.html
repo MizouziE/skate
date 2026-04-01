@@ -33,12 +33,23 @@
             Special Name Grinds
           </label>
         </li>
+        <li>
+          <label for="variations-toggle">
+            <input type="checkbox" name="variations-toggle" id="variations-toggle">
+            Add Variation
+          </label>
+        </li>
       </ul>
     </details>
-    <div id="result"></div>
+    <div id="result">
+      <span id="result-text"></span>
+      <button id="result-skip">Skip</button>
+    </div>
     <div id="wheelOfFortune">
       <canvas id="wheel"></canvas>
       <div id="spin">SPIN</div>
     </div>
+    <button id="reshuffle">Reshuffle</button>
+    <div id="history"></div>
   </body>
 </html>
