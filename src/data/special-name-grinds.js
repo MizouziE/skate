@@ -12,7 +12,7 @@ export const specialNameGrinds = [
       "label": "Fishbrain"
     },
     {
-      "color": "#f2de6",
+      "color": "#0f2de6",
       "label": "Kindgrind"
     },
     {
