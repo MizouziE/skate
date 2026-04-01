@@ -1,7 +1,7 @@
 # Skate Trick Spinner
 
 ## Project Overview
-A wheel-of-fortune style spinner web app for randomly selecting skateboard (aggressive inline) grind tricks. Built with vanilla JS, HTML Canvas, and CSS. Bundled with Parcel.
+A wheel-of-fortune style spinner web app for randomly selecting skateboard (aggressive inline) grind tricks. Built with vanilla JS, HTML Canvas, and CSS. No build step required — ES modules loaded natively. Open `skate.html` via a local server (e.g. VS Code Live Server).
 
 ## Key Files
 - `skate.html` — Main HTML page
@@ -10,40 +10,28 @@ A wheel-of-fortune style spinner web app for randomly selecting skateboard (aggr
 - `src/data/groove-grinds.js` — 24 groove grind tricks
 - `src/data/soul-grinds.js` — 14 soul grind tricks
 - `src/data/special-name-grinds.js` — 11 special name grind tricks
-- `src/data/variations.js` — 21 variations (imported but unused)
+- `src/data/variations.js` — 21 variations (used by variations overlay feature)
 - `src/grabber.js` — Utility scraper (not part of app)
 
 ## Completed Improvements — Mobile-First Redesign
 
-- [x] **1. Mobile Foundation**
-  - Added `viewport-fit=cover` viewport meta tag
-  - Dynamic canvas sizing: `Math.min(innerWidth - 32, visualViewport.height - 160, 480)`
-  - Debounced resize handler; uses `visualViewport.height` for accurate available height
+- [x] **Mobile Foundation** — `viewport-fit=cover`, dynamic canvas sizing with `visualViewport.height`, debounced resize handler
+- [x] **Responsive Layout** — `<details>/<summary>` collapsible list selector, full-width wheel (max 480px), tappable pill-card checkbox labels with red accent
+- [x] **Visual Polish** — `#1a1a1a` dark theme, auto-contrast sector text (`getTextColor()` luminance), dynamic font scaling, wheel ring shadow, spin button bg transition
+- [x] **Interaction Improvements** — Pulse animation on spin, inline result banner with `max-height` expand animation, `fadeUp` on load, fixed listener accumulation bug
+- [x] **Color Data Fix** — Fixed `#f2de6` → `#0f2de6` (Kindgrind), fixed `#44e40` → `#044e40` and `#d8b0b` → `#d8b00b` in variations.js
 
-- [x] **2. Responsive Layout**
-  - List selector converted to `<details>/<summary>` — collapsed by default to save space
-  - Full-width wheel fitting viewport with padding, max 480px
-  - Larger, styled, tappable pill-card checkbox labels (custom checkbox, red accent when checked)
+## Completed Improvements — Functionality Revamp
 
-- [x] **3. Visual Polish** — Dark & gritty theme
-  - `#1a1a1a` background, bold uppercase heading with letter-spacing
-  - Auto-contrast sector text (`getTextColor()` luminance check — dark or white per sector)
-  - Dynamic font scaling in canvas — proportional to radius, shrinks for long labels
-  - Wheel ring shadow via `border-radius: 50%` + `box-shadow` on `#wheel`
-  - Spin button: dark default bg, smooth background transition while spinning
-  - Restored `#spin::after` arrow pointer (was broken by `overflow: hidden`, now fixed)
+- [x] **Fixed wheel count** — Always shows ~12 tricks regardless of how many category checkboxes are ticked. Replaces the old double-`getRandomHalf` approach (which yielded ~4 tricks with one category, ~13 with three). Pool is: all tricks from checked categories → filter exclusions → shuffle → take min(12, available).
+- [x] **Reshuffle button** — "Reshuffle" button below the wheel picks a fresh random 12 without changing category selection. Also clears the skip exclusion list and last-landed state.
+- [x] **Variations overlay** — "Add Variation" toggle in the category list. When on, a random variation (e.g. "Topside", "Fakie", "Truespin") is appended to the result label after each spin.
+- [x] **Skip a trick** — "Skip" button on the result toast. Permanently excludes that trick from the wheel for the current session and immediately re-spins. Cleared by Reshuffle or category change.
+- [x] **Session history** — Last 5 landed tricks shown as a horizontal scrolling row of colored pills below the reshuffle button. Opacity fades older entries.
+- [x] **Prevent immediate repeats** — After a trick lands, the wheel quietly rebuilds (400ms delay, while result is visible) excluding that trick, so the next spin can't immediately repeat it.
 
-- [x] **4. Interaction Improvements**
-  - Pulse CSS animation (`@keyframes pulse`) on spin start
-  - Result banner appears inline above the wheel when spin stops, auto-dismisses after 4s
-    - Uses in-flow `max-height` expand animation (avoids `position: fixed` reliability issues on mobile)
-    - Result placed between `#listSelector` and `#wheelOfFortune` in DOM
-  - `fadeUp` entrance animation on wheel load
-  - Fixed listener accumulation bug — listeners registered once at boot, not inside `init()`
-
-- [x] **5. Color Data Fix**
-  - Fixed broken hex `#f2de6` → `#0f2de6` in `special-name-grinds.js` (Kindgrind)
-  - Auto-contrast text handles all existing sector colors correctly
-
-## Dev
-No build step required. Open `skate.html` via a local server (e.g. VS Code Live Server). ES modules are loaded natively by the browser.
+## Key State (skate.js)
+- `excluded` — `Set` of trick labels the user has skipped; cleared on reshuffle/category change
+- `lastLanded` — base trick label of the most recent result; used as `tempExclude` in next rebuild
+- `sessionHistory` — array of `{label, color}` (max 5), most recent first
+- `TARGET_COUNT = 12` — target number of sectors on the wheel
