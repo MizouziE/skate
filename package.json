@@ -1,0 +1,14 @@
+{
+  "name": "skate",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "test": "web-test-runner",
+    "test:watch": "web-test-runner --watch"
+  },
+  "devDependencies": {
+    "@esm-bundle/chai": "^4.3.4",
+    "@web/test-runner": "^0.18.0",
+    "@web/test-runner-chrome": "^0.15.0"
+  }
+}
