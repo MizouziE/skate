@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
 
     container:
-      image: cypress/browsers:node20.9.0-chrome118
+      image: cypress/browsers:latest
 
     steps:
       - uses: actions/checkout@v4
