@@ -1,0 +1,42 @@
+#modalClose {
+	position: absolute;
+	top: 14px;
+	right: 16px;
+	background: #333;
+	border: none;
+	color: #aaa;
+	width: 32px;
+	height: 32px;
+	border-radius: 50%;
+	font-size: 1.1rem;
+	line-height: 1;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	-webkit-tap-highlight-color: transparent;
+	z-index: 1;
+}
+
+#modalHeader {
+	padding: 18px 52px 14px 20px;
+	display: flex;
+	align-items: baseline;
+	gap: 10px;
+	border-bottom: 1px solid #2e2e2e;
+	flex-shrink: 0;
+}
+
+#modalTitle {
+	font-size: 1rem;
+	font-weight: 800;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: #fff;
+}
+
+#modalPage {
+	font-size: 0.78rem;
+	color: #666;
+	font-weight: 600;
+}

@@ -1,0 +1,89 @@
+/* Validation error */
+#modalError {
+	color: #e83d44;
+	font-size: 0.78rem;
+	font-weight: 600;
+	text-align: center;
+	padding: 6px 16px 0;
+	flex-shrink: 0;
+}
+
+#modalError[hidden] {
+	display: none;
+}
+
+/* Select All / None row */
+#modalSelectRow {
+	display: flex;
+	gap: 8px;
+	padding: 10px 16px 0;
+	flex-shrink: 0;
+}
+
+#selectAll,
+#selectNone {
+	flex: 1;
+	background: #2a2a2a;
+	border: 1px solid #3a3a3a;
+	color: #aaa;
+	border-radius: 8px;
+	padding: 9px 0;
+	font-family:
+		system-ui,
+		-apple-system,
+		sans-serif;
+	font-size: 0.75rem;
+	font-weight: 700;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	cursor: pointer;
+	-webkit-tap-highlight-color: transparent;
+	transition: background 0.12s;
+}
+
+#selectAll:active,
+#selectNone:active {
+	background: #333;
+}
+
+/* Prev / Next nav */
+#modalNav {
+	display: flex;
+	gap: 10px;
+	padding: 12px 16px 20px;
+	flex-shrink: 0;
+}
+
+#modalPrev,
+#modalNext {
+	flex: 1;
+	border-radius: 12px;
+	padding: 14px 0;
+	font-family:
+		system-ui,
+		-apple-system,
+		sans-serif;
+	font-size: 0.85rem;
+	font-weight: 800;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	cursor: pointer;
+	border: none;
+	-webkit-tap-highlight-color: transparent;
+	transition: opacity 0.15s;
+}
+
+#modalPrev {
+	background: #2a2a2a;
+	color: #888;
+}
+
+#modalNext {
+	background: #e83d44;
+	color: #fff;
+}
+
+#modalPrev:active,
+#modalNext:active {
+	opacity: 0.75;
+}

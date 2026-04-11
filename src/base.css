@@ -1,0 +1,64 @@
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+/* Shared custom checkbox */
+.custom-checkbox {
+	appearance: none;
+	-webkit-appearance: none;
+	width: 24px;
+	height: 24px;
+	min-width: 24px;
+	border: 2px solid #555;
+	border-radius: 6px;
+	background: #1a1a1a;
+	cursor: pointer;
+	position: relative;
+	transition:
+		background 0.15s,
+		border-color 0.15s;
+	flex-shrink: 0;
+}
+
+.custom-checkbox:checked {
+	background: #e83d44;
+	border-color: #e83d44;
+}
+
+.custom-checkbox:checked::after {
+	content: '✓';
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	color: #fff;
+	font-size: 15px;
+	font-weight: 900;
+	line-height: 1;
+}
+
+body {
+	min-height: 100dvh;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 16px;
+	padding: 16px 16px 24px;
+	font-family:
+		system-ui,
+		-apple-system,
+		sans-serif;
+	background: #1a1a1a;
+	color: #e8e8e8;
+}
+
+header h1 {
+	font-size: clamp(1.3rem, 6vw, 2rem);
+	font-weight: 900;
+	letter-spacing: 0.15em;
+	text-transform: uppercase;
+	color: #fff;
+	text-align: center;
+}
