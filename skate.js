@@ -3,6 +3,19 @@ import { soulGrinds } from "./src/data/soul-grinds.js";
 import { specialNameGrinds } from "./src/data/special-name-grinds.js";
 import { variations } from "./src/data/variations.js";
 
+import { categorySelectorTemplate } from './src/components/category-selector/template.js';
+import { trickModalTemplate } from './src/components/trick-modal/template.js';
+import { statusModalTemplate } from './src/components/status-modal/template.js';
+
+import { initCategorySelector } from './src/components/category-selector/index.js';
+import { initTrickModal, loadCustomSelections, saveCustomSelections, applyCustomMode } from './src/components/trick-modal/index.js';
+import { initStatusModal } from './src/components/status-modal/index.js';
+
+// Inject component templates before querying any of their elements
+document.querySelector('header').insertAdjacentHTML('afterend', categorySelectorTemplate);
+document.body.insertAdjacentHTML('beforeend', trickModalTemplate);
+document.body.insertAdjacentHTML('beforeend', statusModalTemplate);
+
 const canvas = document.querySelector('#wheel');
 const ctx = canvas.getContext('2d');
 const spinEl = document.querySelector('#spin');
@@ -11,26 +24,6 @@ const resultTextEl = document.querySelector('#result-text');
 const resultSkipEl = document.querySelector('#result-skip');
 const reshuffleEl = document.querySelector('#reshuffle');
 const historyEl = document.querySelector('#history');
-const customizeBtnEl = document.querySelector('#customizeBtn');
-const customModeBarEl = document.querySelector('#customModeBar');
-const clearCustomEl = document.querySelector('#clearCustom');
-const trickModalEl = document.querySelector('#trickModal');
-const modalBackdropEl = document.querySelector('#modalBackdrop');
-const modalTitleEl = document.querySelector('#modalTitle');
-const modalPageEl = document.querySelector('#modalPage');
-const modalListEl = document.querySelector('#modalList');
-const modalErrorEl = document.querySelector('#modalError');
-const modalPrevEl = document.querySelector('#modalPrev');
-const modalNextEl = document.querySelector('#modalNext');
-const selectAllEl = document.querySelector('#selectAll');
-const selectNoneEl = document.querySelector('#selectNone');
-const modalCloseEl = document.querySelector('#modalClose');
-const statusModalEl = document.querySelector('#statusModal');
-const statusBackdropEl = document.querySelector('#statusBackdrop');
-const statusTrickLabelEl = document.querySelector('#statusTrickLabel');
-const btnLandedEl = document.querySelector('#btnLanded');
-const btnMissedEl = document.querySelector('#btnMissed');
-const btnSkipEl = document.querySelector('#btnSkip');
 
 const PI = Math.PI;
 const TAU = 2 * PI;
@@ -56,24 +49,39 @@ let resizeTimer = null;
 let excluded = new Set();
 let lastLanded = null;
 let sessionHistory = [];
-let statusModalIdx = -1;
 
 // Custom mode state
 let customMode = false;
-let customTricks = [];   // in-memory copy of saved trick objects
-let customVariations = []; // in-memory copy of saved variation objects
+let customTricks = [];
+let customVariations = [];
 let customVariationsEnabled = false;
 
-// Modal state
-let modalPage = 0;
-let modalDraft = { tricks: new Set(), variations: new Set(), variationsEnabled: false };
+// ── State bridge ───────────────────────────────────────────────────────────
+// Shared mutable state passed to component init functions via getters/setters.
 
-const MODAL_PAGES = [
-  { title: 'Groove Grinds',       data: grooveGrinds },
-  { title: 'Soul Grinds',         data: soulGrinds },
-  { title: 'Special Name Grinds', data: specialNameGrinds },
-  { title: 'Variations',          data: variations, isVariations: true },
-];
+const state = {
+  get excluded()              { return excluded; },
+  get tot()                   { return tot; },
+  get lastLanded()            { return lastLanded; },
+  set lastLanded(v)           { lastLanded = v; },
+  get sessionHistory()        { return sessionHistory; },
+  set sessionHistory(v)       { sessionHistory = v; },
+  get customMode()            { return customMode; },
+  set customMode(v)           { customMode = v; },
+  get customTricks()          { return customTricks; },
+  set customTricks(v)         { customTricks = v; },
+  get customVariations()      { return customVariations; },
+  set customVariations(v)     { customVariations = v; },
+  get customVariationsEnabled() { return customVariationsEnabled; },
+  set customVariationsEnabled(v) { customVariationsEnabled = v; },
+  rebuildSectors: () => rebuildSectors(),
+  drawWheel:      () => drawWheel(),
+  rotate:         () => rotate(),
+  renderHistory:  () => renderHistory(),
+  getTextColor,
+  saveWithHistory: null,   // set below after saveCustomSelections is in scope
+  openStatusModal: null,   // set by initStatusModal
+};
 
 // ── Canvas sizing ──────────────────────────────────────────────────────────
 
@@ -284,7 +292,7 @@ function handleSkip() {
   if (sessionHistory.length) {
     sessionHistory[0].status = 'skipped';
     renderHistory();
-    saveWithHistory();
+    state.saveWithHistory();
   }
   resultEl.classList.remove('visible');
   clearTimeout(resultTimer);
@@ -308,186 +316,9 @@ function handleResize() {
   }, 150);
 }
 
-// ── IndexedDB ──────────────────────────────────────────────────────────────
+// ── Boot ───────────────────────────────────────────────────────────────────
 
-function openDB() {
-  return new Promise((resolve, reject) => {
-    const req = indexedDB.open('skateDB', 1);
-    req.onupgradeneeded = e => {
-      e.target.result.createObjectStore('userSelections', { keyPath: 'id' });
-    };
-    req.onsuccess = e => resolve(e.target.result);
-    req.onerror = e => reject(e.target.error);
-  });
-}
-
-async function loadCustomSelections() {
-  const db = await openDB();
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction('userSelections', 'readonly');
-    const req = tx.objectStore('userSelections').get('main');
-    req.onsuccess = e => resolve(e.target.result ?? null);
-    req.onerror = e => reject(e.target.error);
-  });
-}
-
-async function saveCustomSelections(data) {
-  const db = await openDB();
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction('userSelections', 'readwrite');
-    const req = tx.objectStore('userSelections').put({ id: 'main', ...data });
-    req.onsuccess = () => resolve();
-    req.onerror = e => reject(e.target.error);
-  });
-}
-
-async function clearCustomSelections() {
-  const db = await openDB();
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction('userSelections', 'readwrite');
-    const req = tx.objectStore('userSelections').delete('main');
-    req.onsuccess = () => resolve();
-    req.onerror = e => reject(e.target.error);
-  });
-}
-
-// ── Custom mode helpers ────────────────────────────────────────────────────
-
-function applyCustomMode(record) {
-  // Resolve trick objects from saved labels
-  const allTricks = [...grooveGrinds, ...soulGrinds, ...specialNameGrinds];
-  customTricks = allTricks.filter(t => record.tricks.includes(t.label));
-  customVariations = variations.filter(v => record.variations.includes(v.label));
-  customVariationsEnabled = record.variationsEnabled;
-
-  customMode = true;
-  customModeBarEl.hidden = false;
-  document.querySelector('#listSelector').classList.add('disabled');
-  document.querySelector('#variations-toggle').disabled = true;
-}
-
-function disableCustomMode() {
-  customMode = false;
-  customTricks = [];
-  customVariations = [];
-  customVariationsEnabled = false;
-  customModeBarEl.hidden = true;
-  document.querySelector('#listSelector').classList.remove('disabled');
-  document.querySelector('#variations-toggle').disabled = false;
-}
-
-// ── Modal ──────────────────────────────────────────────────────────────────
-
-function openModal() {
-  // Populate draft from current custom selection (or blank)
-  if (customMode) {
-    modalDraft.tricks = new Set(customTricks.map(t => t.label));
-    modalDraft.variations = new Set(customVariations.map(v => v.label));
-    modalDraft.variationsEnabled = customVariationsEnabled;
-  } else {
-    modalDraft.tricks = new Set();
-    modalDraft.variations = new Set();
-    modalDraft.variationsEnabled = false;
-  }
-  modalPage = 0;
-  trickModalEl.hidden = false;
-  document.body.style.overflow = 'hidden';
-  renderModalPage(modalPage);
-}
-
-function closeModal() {
-  trickModalEl.hidden = true;
-  document.body.style.overflow = '';
-  modalErrorEl.hidden = true;
-}
-
-function renderModalPage(i) {
-  const page = MODAL_PAGES[i];
-  modalTitleEl.textContent = page.title;
-  modalPageEl.textContent = `(${i + 1}/${MODAL_PAGES.length})`;
-
-  // Prev button visibility
-  modalPrevEl.style.visibility = i === 0 ? 'hidden' : 'visible';
-
-  // Next/Save label
-  modalNextEl.textContent = i === MODAL_PAGES.length - 1 ? 'Save' : 'Next →';
-
-  // Build list
-  let html = '';
-
-  if (page.isVariations) {
-    const checked = modalDraft.variationsEnabled ? 'checked' : '';
-    html += `<label class="modal-toggle-label">
-      <input type="checkbox" id="varToggle" class="modal-var-toggle" ${checked}>
-      Apply a variation to each result
-    </label>`;
-  }
-
-  html += page.data.map(item => {
-    const set = page.isVariations ? modalDraft.variations : modalDraft.tricks;
-    const checked = set.has(item.label) ? 'checked' : '';
-    return `<label class="modal-item-label">
-      <input type="checkbox" class="modal-item-cb" data-label="${item.label}" ${checked}>
-      <span class="modal-item-dot" style="background:${item.color}"></span>
-      ${item.label}
-    </label>`;
-  }).join('');
-
-  modalListEl.innerHTML = html;
-  modalListEl.scrollTop = 0;
-  modalErrorEl.hidden = true;
-
-  // Wire variation toggle
-  if (page.isVariations) {
-    modalListEl.querySelector('#varToggle').addEventListener('change', e => {
-      modalDraft.variationsEnabled = e.target.checked;
-    });
-  }
-
-  // Wire item checkboxes
-  modalListEl.querySelectorAll('.modal-item-cb').forEach(cb => {
-    cb.addEventListener('change', e => {
-      const set = page.isVariations ? modalDraft.variations : modalDraft.tricks;
-      if (e.target.checked) set.add(e.target.dataset.label);
-      else set.delete(e.target.dataset.label);
-    });
-  });
-}
-
-async function handleModalSave() {
-  if (modalDraft.tricks.size === 0) {
-    modalErrorEl.hidden = false;
-    return;
-  }
-  const record = {
-    tricks: [...modalDraft.tricks],
-    variations: [...modalDraft.variations],
-    variationsEnabled: modalDraft.variationsEnabled,
-    history: sessionHistory,
-  };
-  await saveCustomSelections(record);
-  applyCustomMode(record);
-  closeModal();
-  excluded.clear();
-  lastLanded = null;
-  rebuildSectors();
-  drawWheel();
-  rotate();
-}
-
-async function handleClearCustom() {
-  await clearCustomSelections();
-  disableCustomMode();
-  excluded.clear();
-  lastLanded = null;
-  rebuildSectors();
-  drawWheel();
-  rotate();
-}
-
-// ── Status modal ───────────────────────────────────────────────────────────
-
-function saveWithHistory() {
+state.saveWithHistory = function saveWithHistory() {
   if (!customMode) return;
   saveCustomSelections({
     tricks: customTricks.map(t => t.label),
@@ -495,31 +326,7 @@ function saveWithHistory() {
     variationsEnabled: customVariationsEnabled,
     history: sessionHistory,
   });
-}
-
-function openStatusModal(idx) {
-  statusModalIdx = idx;
-  const h = sessionHistory[idx];
-  statusTrickLabelEl.textContent = h.label;
-  statusTrickLabelEl.style.background = h.color;
-  statusTrickLabelEl.style.color = getTextColor(h.color);
-  statusModalEl.hidden = false;
-}
-
-function closeStatusModal() {
-  statusModalEl.hidden = true;
-  statusModalIdx = -1;
-}
-
-function applyStatus(status) {
-  if (statusModalIdx < 0) return;
-  sessionHistory[statusModalIdx].status = status;
-  renderHistory();
-  saveWithHistory();
-  closeStatusModal();
-}
-
-// ── Boot ───────────────────────────────────────────────────────────────────
+};
 
 setCanvasSize();
 engine();
@@ -527,7 +334,7 @@ engine();
 // Load custom selections from IndexedDB before first render
 loadCustomSelections().then(record => {
   if (record) {
-    applyCustomMode(record);
+    applyCustomMode(state, record);
     if (record.history?.length) {
       sessionHistory = record.history.slice(0, MAX_HISTORY);
       renderHistory();
@@ -542,74 +349,24 @@ loadCustomSelections().then(record => {
   rotate();
 });
 
+initCategorySelector(state, listMap);
+initTrickModal(state);
+initStatusModal(state);
+
 spinEl.addEventListener('click', handleSpin);
 reshuffleEl.addEventListener('click', handleReshuffle);
 resultSkipEl.addEventListener('click', handleSkip);
 window.addEventListener('resize', handleResize);
 
-// Category checkboxes
-document.querySelectorAll('#listSelector input[type="checkbox"]').forEach(input => {
-  input.addEventListener('change', () => {
-    if (!listMap[input.name]) return; // variations-toggle — no rebuild needed
-    excluded.clear();
-    lastLanded = null;
-    rebuildSectors();
-    if (tot) drawWheel();
-    rotate();
-  });
-});
-
-// Modal event listeners
-customizeBtnEl.addEventListener('click', openModal);
-clearCustomEl.addEventListener('click', handleClearCustom);
-modalCloseEl.addEventListener('click', closeModal);
-modalBackdropEl.addEventListener('click', closeModal);
-
-modalPrevEl.addEventListener('click', () => {
-  if (modalPage > 0) {
-    modalPage--;
-    renderModalPage(modalPage);
-  }
-});
-
-modalNextEl.addEventListener('click', () => {
-  if (modalPage < MODAL_PAGES.length - 1) {
-    modalPage++;
-    renderModalPage(modalPage);
-  } else {
-    handleModalSave();
-  }
-});
-
-selectAllEl.addEventListener('click', () => {
-  const page = MODAL_PAGES[modalPage];
-  const set = page.isVariations ? modalDraft.variations : modalDraft.tricks;
-  page.data.forEach(item => set.add(item.label));
-  modalListEl.querySelectorAll('.modal-item-cb').forEach(cb => { cb.checked = true; });
-});
-
-selectNoneEl.addEventListener('click', () => {
-  const page = MODAL_PAGES[modalPage];
-  const set = page.isVariations ? modalDraft.variations : modalDraft.tricks;
-  page.data.forEach(item => set.delete(item.label));
-  modalListEl.querySelectorAll('.modal-item-cb').forEach(cb => { cb.checked = false; });
-});
-
 // History pill click → status modal
 historyEl.addEventListener('click', e => {
   const btn = e.target.closest('button.history-item');
   if (!btn) return;
-  openStatusModal(Number(btn.dataset.idx));
+  state.openStatusModal(Number(btn.dataset.idx));
 });
 
 // Result banner tap → status modal
 resultEl.addEventListener('click', e => {
   if (e.target === resultSkipEl || resultSkipEl.contains(e.target)) return;
-  if (sessionHistory.length) openStatusModal(0);
+  if (sessionHistory.length) state.openStatusModal(0);
 });
-
-// Status modal
-statusBackdropEl.addEventListener('click', closeStatusModal);
-btnLandedEl.addEventListener('click', () => applyStatus('landed'));
-btnMissedEl.addEventListener('click', () => applyStatus('missed'));
-btnSkipEl.addEventListener('click', () => applyStatus('skipped'));
