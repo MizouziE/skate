@@ -1,111 +1,62 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-  <head>
-    <title>Wheel of Skate</title>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <meta name="description" content="Spin the wheel, land a grind. A trick randomiser for aggressive inline skating — 49 tricks, 21 variations, zero excuses." />
+	<head>
+		<title>Wheel of Skate</title>
+		<meta charset="UTF-8" />
+		<meta
+			name="viewport"
+			content="width=device-width, initial-scale=1, viewport-fit=cover"
+		/>
+		<meta
+			name="description"
+			content="Spin the wheel, land a grind. A trick randomiser for aggressive inline skating — 49 tricks, 21 variations, zero excuses."
+		/>
 
-    <!-- Open Graph (WhatsApp, Facebook, iMessage, Slack…) -->
-    <meta property="og:title" content="Wheel of Skate" />
-    <meta property="og:description" content="Spin the wheel, land a grind. A trick randomiser for aggressive inline skating — 49 tricks, 21 variations, zero excuses." />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://www.mizouzie.dev/skate/skate.html" />
+		<!-- Open Graph (WhatsApp, Facebook, iMessage, Slack…) -->
+		<meta property="og:title" content="Wheel of Skate" />
+		<meta
+			property="og:description"
+			content="Spin the wheel, land a grind. A trick randomiser for aggressive inline skating — 49 tricks, 21 variations, zero excuses."
+		/>
+		<meta property="og:type" content="website" />
+		<meta
+			property="og:url"
+			content="https://www.mizouzie.dev/skate/skate.html"
+		/>
 
-    <meta property="og:image" content="https://www.mizouzie.dev/skate/src/wheel-of-skate.png" />
+		<meta
+			property="og:image"
+			content="https://www.mizouzie.dev/skate/src/wheel-of-skate.png"
+		/>
 
-    <!-- Twitter / X card -->
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Wheel of Skate" />
-    <meta name="twitter:description" content="Spin the wheel, land a grind. A trick randomiser for aggressive inline skating — 49 tricks, 21 variations, zero excuses." />
-    <meta name="twitter:image" content="https://www.mizouzie.dev/skate/src/wheel-of-skate.png" />
-    <script defer src="skate.js" type="module"></script>
-    <link rel="stylesheet" href="src/skate.css" />
-  </head>
+		<!-- Twitter / X card -->
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:title" content="Wheel of Skate" />
+		<meta
+			name="twitter:description"
+			content="Spin the wheel, land a grind. A trick randomiser for aggressive inline skating — 49 tricks, 21 variations, zero excuses."
+		/>
+		<meta
+			name="twitter:image"
+			content="https://www.mizouzie.dev/skate/src/wheel-of-skate.png"
+		/>
+		<script defer src="skate.js" type="module"></script>
+		<link rel="stylesheet" href="src/skate.css" />
+	</head>
 
-  <body>
-    <header>
-      <h1>Wheel of Skate</h1>
-    </header>
-    <details id="listSelector">
-      <summary>Choose your list</summary>
-      <ul>
-        <li>
-          <label for="groove-grinds">
-            <input type="checkbox" name="groove-grinds" id="groove-grinds" checked>
-            Groove Grinds
-          </label>
-        </li>
-        <li>
-          <label for="soul-grinds">
-            <input type="checkbox" name="soul-grinds" id="soul-grinds" checked>
-            Soul Grinds
-          </label>
-        </li>
-        <li>
-          <label for="special-name-grinds">
-            <input type="checkbox" name="special-name-grinds" id="special-name-grinds" checked>
-            Special Name Grinds
-          </label>
-        </li>
-        <li>
-          <label for="variations-toggle">
-            <input type="checkbox" name="variations-toggle" id="variations-toggle">
-            Add Variation
-          </label>
-        </li>
-      </ul>
-    </details>
-    <button id="customizeBtn">Customize tricks</button>
-    <div id="customModeBar" hidden>
-      Custom selection active
-      <button id="clearCustom">Clear</button>
-    </div>
-
-    <!-- Per-trick selection modal -->
-    <div id="trickModal" hidden>
-      <div id="modalBackdrop"></div>
-      <div id="modalSheet">
-        <button id="modalClose" aria-label="Close">×</button>
-        <div id="modalHeader">
-          <span id="modalTitle"></span>
-          <span id="modalPage"></span>
-        </div>
-        <div id="modalList"></div>
-        <p id="modalError" hidden>Select at least 1 trick before saving.</p>
-        <div id="modalSelectRow">
-          <button id="selectAll">Select All</button>
-          <button id="selectNone">None</button>
-        </div>
-        <div id="modalNav">
-          <button id="modalPrev">← Prev</button>
-          <button id="modalNext">Next →</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Trick status modal -->
-    <div id="statusModal" hidden>
-      <div id="statusBackdrop"></div>
-      <div id="statusSheet">
-        <div id="statusTrickLabel"></div>
-        <div id="statusButtons">
-          <button id="btnLanded">✓ Landed</button>
-          <button id="btnMissed">✗ Missed</button>
-          <button id="btnSkip">— Skip</button>
-        </div>
-      </div>
-    </div>
-
-    <div id="result">
-      <span id="result-text"></span>
-      <button id="result-skip">Skip</button>
-    </div>
-    <div id="wheelOfFortune">
-      <canvas id="wheel"></canvas>
-      <div id="spin">SPIN</div>
-    </div>
-    <button id="reshuffle">Reshuffle</button>
-    <div id="history"></div>
-  </body>
+	<body>
+		<header>
+			<h1>Wheel of Skate</h1>
+		</header>
+		<div id="result">
+			<span id="result-text"></span>
+			<button id="result-skip">Skip</button>
+		</div>
+		<div id="wheelOfFortune">
+			<canvas id="wheel"></canvas>
+			<div id="spin">SPIN</div>
+		</div>
+		<button id="reshuffle">Reshuffle</button>
+		<div id="history"></div>
+	</body>
 </html>
