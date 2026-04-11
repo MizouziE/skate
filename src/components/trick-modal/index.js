@@ -89,7 +89,7 @@ function renderModalPage() {
 	if (page.isVariations) {
 		const checked = modalDraft.variationsEnabled ? 'checked' : '';
 		html += `<label class="modal-toggle-label">
-      <input type="checkbox" id="varToggle" class="modal-var-toggle" ${checked}>
+      <input type="checkbox" id="varToggle" class="modal-var-toggle custom-checkbox" ${checked}>
       Apply a variation to each result
     </label>`;
 	}
@@ -99,7 +99,7 @@ function renderModalPage() {
 			const set = page.isVariations ? modalDraft.variations : modalDraft.tricks;
 			const checked = set.has(item.label) ? 'checked' : '';
 			return `<label class="modal-item-label">
-      <input type="checkbox" class="modal-item-cb" data-label="${item.label}" ${checked}>
+      <input type="checkbox" class="modal-item-cb custom-checkbox" data-label="${item.label}" ${checked}>
       <span class="modal-item-dot" style="background:${item.color}"></span>
       ${item.label}
     </label>`;

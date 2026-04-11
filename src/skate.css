@@ -4,6 +4,41 @@
 	box-sizing: border-box;
 }
 
+/* Shared custom checkbox */
+.custom-checkbox {
+	appearance: none;
+	-webkit-appearance: none;
+	width: 24px;
+	height: 24px;
+	min-width: 24px;
+	border: 2px solid #555;
+	border-radius: 6px;
+	background: #1a1a1a;
+	cursor: pointer;
+	position: relative;
+	transition:
+		background 0.15s,
+		border-color 0.15s;
+	flex-shrink: 0;
+}
+
+.custom-checkbox:checked {
+	background: #e83d44;
+	border-color: #e83d44;
+}
+
+.custom-checkbox:checked::after {
+	content: '✓';
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	color: #fff;
+	font-size: 15px;
+	font-weight: 900;
+	line-height: 1;
+}
+
 body {
 	min-height: 100dvh;
 	display: flex;
@@ -95,40 +130,6 @@ header h1 {
 
 #listSelector li label:active {
 	background: #383838;
-}
-
-#listSelector li label input[type='checkbox'] {
-	appearance: none;
-	-webkit-appearance: none;
-	width: 24px;
-	height: 24px;
-	min-width: 24px;
-	border: 2px solid #555;
-	border-radius: 6px;
-	background: #1a1a1a;
-	cursor: pointer;
-	position: relative;
-	transition:
-		background 0.15s,
-		border-color 0.15s;
-	flex-shrink: 0;
-}
-
-#listSelector li label input[type='checkbox']:checked {
-	background: #e83d44;
-	border-color: #e83d44;
-}
-
-#listSelector li label input[type='checkbox']:checked::after {
-	content: '✓';
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
-	color: #fff;
-	font-size: 15px;
-	font-weight: 900;
-	line-height: 1;
 }
 
 /* Wheel */
@@ -549,40 +550,6 @@ header h1 {
 	-webkit-tap-highlight-color: transparent;
 }
 
-.modal-var-toggle {
-	appearance: none;
-	-webkit-appearance: none;
-	width: 24px;
-	height: 24px;
-	min-width: 24px;
-	border: 2px solid #555;
-	border-radius: 6px;
-	background: #1a1a1a;
-	cursor: pointer;
-	position: relative;
-	transition:
-		background 0.15s,
-		border-color 0.15s;
-	flex-shrink: 0;
-}
-
-.modal-var-toggle:checked {
-	background: #e83d44;
-	border-color: #e83d44;
-}
-
-.modal-var-toggle:checked::after {
-	content: '✓';
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
-	color: #fff;
-	font-size: 15px;
-	font-weight: 900;
-	line-height: 1;
-}
-
 /* Trick item row */
 .modal-item-label {
 	display: flex;
@@ -604,38 +571,15 @@ header h1 {
 	background: #2e2e2e;
 }
 
-.modal-item-label input[type='checkbox'] {
-	appearance: none;
-	-webkit-appearance: none;
+.modal-item-label .custom-checkbox {
 	width: 22px;
 	height: 22px;
 	min-width: 22px;
-	border: 2px solid #555;
 	border-radius: 5px;
-	background: #1a1a1a;
-	cursor: pointer;
-	position: relative;
-	transition:
-		background 0.15s,
-		border-color 0.15s;
-	flex-shrink: 0;
 }
 
-.modal-item-label input[type='checkbox']:checked {
-	background: #e83d44;
-	border-color: #e83d44;
-}
-
-.modal-item-label input[type='checkbox']:checked::after {
-	content: '✓';
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
-	color: #fff;
+.modal-item-label .custom-checkbox:checked::after {
 	font-size: 14px;
-	font-weight: 900;
-	line-height: 1;
 }
 
 .modal-item-dot {
