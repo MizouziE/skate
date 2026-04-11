@@ -12,15 +12,15 @@ A mobile-first web app that puts **49 aggressive inline grind tricks** on a colo
 
 ## Features
 
-| | |
-|---|---|
+|                              |                                                                                                                     |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------- |
 | 🎡 **Fixed 12-sector wheel** | Always shows ~12 tricks regardless of how many categories you select — the wheel never feels sparse or overwhelming |
-| 🔀 **Reshuffle** | One tap picks a fresh random 12 from your selected categories, without changing your settings |
-| ⏭️ **Skip a trick** | Can't (or won't) do that one? Skip it — it's excluded from the session until you reshuffle |
-| 🎲 **Variations overlay** | Toggle on "Add Variation" to append a random modifier to each result — *Makio — Topside*, *Soul — Fakie*, etc. |
-| 🕑 **Session history** | Last 5 results trail along the bottom as colour-coded pills so you can see what you've already hit |
-| 🚫 **No immediate repeats** | After landing a trick the wheel quietly refreshes, making it impossible to land the same trick twice in a row |
-| 📱 **Mobile-first** | Wheel scales to fill whatever screen you're on, up to 480px. Tap targets are large, no pinching needed |
+| 🔀 **Reshuffle**             | One tap picks a fresh random 12 from your selected categories, without changing your settings                       |
+| ⏭️ **Skip a trick**          | Can't (or won't) do that one? Skip it — it's excluded from the session until you reshuffle                          |
+| 🎲 **Variations overlay**    | Toggle on "Add Variation" to append a random modifier to each result — _Makio — Topside_, _Soul — Fakie_, etc.      |
+| 🕑 **Session history**       | Last 5 results trail along the bottom as colour-coded pills so you can see what you've already hit                  |
+| 🚫 **No immediate repeats**  | After landing a trick the wheel quietly refreshes, making it impossible to land the same trick twice in a row       |
+| 📱 **Mobile-first**          | Wheel scales to fill whatever screen you're on, up to 480px. Tap targets are large, no pinching needed              |
 
 ---
 
@@ -99,4 +99,4 @@ Each trick has its own hex colour baked into the data files. Text on each sector
 
 ---
 
-*Built for the streets. No frameworks, no bundler, no nonsense.*
+_Built for the streets. No frameworks, no bundler, no nonsense._

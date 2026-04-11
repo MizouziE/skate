@@ -1,9 +1,11 @@
 # Skate Trick Spinner
 
 ## Project Overview
+
 A wheel-of-fortune style spinner web app for randomly selecting skateboard (aggressive inline) grind tricks. Built with vanilla JS, HTML Canvas, and CSS. No build step required — ES modules loaded natively. Open `skate.html` via a local server (e.g. VS Code Live Server).
 
 ## Key Files
+
 - `skate.html` — Main HTML page
 - `skate.js` — Wheel logic, spin engine, UI event handling
 - `src/skate.css` — All styling
@@ -31,6 +33,7 @@ A wheel-of-fortune style spinner web app for randomly selecting skateboard (aggr
 - [x] **Prevent immediate repeats** — After a trick lands, the wheel quietly rebuilds (400ms delay, while result is visible) excluding that trick, so the next spin can't immediately repeat it.
 
 ## Key State (skate.js)
+
 - `excluded` — `Set` of trick labels the user has skipped; cleared on reshuffle/category change
 - `lastLanded` — base trick label of the most recent result; used as `tempExclude` in next rebuild
 - `sessionHistory` — array of `{label, color}` (max 5), most recent first
