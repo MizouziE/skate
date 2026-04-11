@@ -4,4 +4,5 @@ export default {
 	files: 'src/**/*.test.js',
 	browsers: [chromeLauncher()],
 	nodeResolve: true,
+	concurrency: 1,
 };
