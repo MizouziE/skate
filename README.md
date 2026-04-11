@@ -18,8 +18,9 @@ A mobile-first web app that puts **49 aggressive inline grind tricks** on a colo
 | 🔀 **Reshuffle**             | One tap picks a fresh random 12 from your selected categories, without changing your settings                       |
 | ⏭️ **Skip a trick**          | Can't (or won't) do that one? Skip it — it's excluded from the session until you reshuffle                          |
 | 🎲 **Variations overlay**    | Toggle on "Add Variation" to append a random modifier to each result — _Makio — Topside_, _Soul — Fakie_, etc.      |
-| 🕑 **Session history**       | Last 5 results trail along the bottom as colour-coded pills so you can see what you've already hit                  |
+| 🕑 **Session history**       | Last 5 results as colour-coded pills — tap a pill to mark it landed, missed, or skipped                             |
 | 🚫 **No immediate repeats**  | After landing a trick the wheel quietly refreshes, making it impossible to land the same trick twice in a row       |
+| 🎛️ **Custom trick mode**     | Hand-pick exactly which tricks and variations go on the wheel — selection is saved to IndexedDB between sessions    |
 | 📱 **Mobile-first**          | Wheel scales to fill whatever screen you're on, up to 480px. Tap targets are large, no pinching needed              |
 
 ---
@@ -41,13 +42,17 @@ Tick any combination of categories — the wheel always fills to 12.
 
 ```
 skate.html          ← single page, no framework
-skate.js            ← all logic: wheel engine, spin physics, data helpers
+skate.js            ← wheel engine, spin physics, state, UI event handling
 src/skate.css       ← all styles: dark theme, animations, responsive layout
 src/data/
-  groove-grinds.js  ← 24 tricks with hex colour per sector
-  soul-grinds.js    ← 14 tricks
-  special-name-grinds.js ← 11 tricks
-  variations.js     ← 21 variation modifiers
+  groove-grinds.js        ← 24 tricks with hex colour per sector
+  soul-grinds.js          ← 14 tricks
+  special-name-grinds.js  ← 11 tricks
+  variations.js           ← 21 variation modifiers
+src/components/
+  category-selector/      ← checkbox UI, triggers wheel rebuild on change
+  trick-modal/            ← custom trick picker modal + IndexedDB persistence
+  status-modal/           ← landed/missed/skipped outcome tracking
 ```
 
 ### Spin engine
