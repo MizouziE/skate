@@ -1,20 +1,20 @@
-import { grooveGrinds } from './src/data/groove-grinds.js';
-import { soulGrinds } from './src/data/soul-grinds.js';
-import { specialNameGrinds } from './src/data/special-name-grinds.js';
-import { variations } from './src/data/variations.js';
+import { grooveGrinds } from './data/groove-grinds.js';
+import { soulGrinds } from './data/soul-grinds.js';
+import { specialNameGrinds } from './data/special-name-grinds.js';
+import { variations } from './data/variations.js';
 
-import { categorySelectorTemplate } from './src/components/category-selector/template.js';
-import { trickModalTemplate } from './src/components/trick-modal/template.js';
-import { statusModalTemplate } from './src/components/status-modal/template.js';
+import { categorySelectorTemplate } from './components/category-selector/template.js';
+import { trickModalTemplate } from './components/trick-modal/template.js';
+import { statusModalTemplate } from './components/status-modal/template.js';
 
-import { initCategorySelector } from './src/components/category-selector/index.js';
+import { initCategorySelector } from './components/category-selector/index.js';
 import {
 	initTrickModal,
 	loadCustomSelections,
 	saveCustomSelections,
 	applyCustomMode,
-} from './src/components/trick-modal/index.js';
-import { initStatusModal } from './src/components/status-modal/index.js';
+} from './components/trick-modal/index.js';
+import { initStatusModal } from './components/status-modal/index.js';
 
 // Inject component templates before querying any of their elements
 document
@@ -109,6 +109,9 @@ const state = {
 	set customVariationsEnabled(v) {
 		customVariationsEnabled = v;
 	},
+	get sectors() {
+		return sectors;
+	},
 	rebuildSectors: () => rebuildSectors(),
 	drawWheel: () => drawWheel(),
 	rotate: () => rotate(),
@@ -180,8 +183,8 @@ function drawWheel() {
 
 // ── Spin logic ─────────────────────────────────────────────────────────────
 
-function getIndex() {
-	return Math.floor(tot - (ang / TAU) * tot) % tot;
+function getIndex(a, t) {
+	return Math.floor(t - (a / TAU) * t) % t;
 }
 
 function getVariation() {
@@ -243,16 +246,12 @@ function showResult(sector) {
 	addToHistory(displayLabel, sector.color);
 
 	// Quietly rebuild wheel while result is visible, excluding what just landed
-	setTimeout(() => {
-		rebuildSectors(sector.label);
-		drawWheel();
-		rotate();
-	}, 400);
+	setTimeout(() => resetAndRebuild({ tempExclude: sector.label }), 400);
 }
 
 function rotate() {
 	if (!tot) return;
-	const sector = sectors[getIndex()];
+	const sector = sectors[getIndex(ang, tot)];
 	canvas.style.transform = `rotate(${ang - PI / 2}rad)`;
 	if (angVel) {
 		spinEl.textContent = sector.label;
@@ -266,7 +265,7 @@ function rotate() {
 function frame() {
 	if (!angVel) {
 		if (wasSpinning && tot) {
-			showResult(sectors[getIndex()]);
+			showResult(sectors[getIndex(ang, tot)]);
 			wasSpinning = false;
 		}
 		return;
@@ -315,6 +314,13 @@ function rebuildSectors(tempExclude = null) {
 
 // ── Event handlers ─────────────────────────────────────────────────────────
 
+function resetAndRebuild({ clearExcluded = false, tempExclude = null } = {}) {
+	if (clearExcluded) { excluded.clear(); lastLanded = null; }
+	rebuildSectors(tempExclude);
+	drawWheel();
+	rotate();
+}
+
 function handleSpin() {
 	if (!angVel && tot) {
 		angVel = rand(0.25, 0.45);
@@ -326,11 +332,7 @@ function handleSpin() {
 }
 
 function handleReshuffle() {
-	excluded.clear();
-	lastLanded = null;
-	rebuildSectors();
-	drawWheel();
-	rotate();
+	resetAndRebuild({ clearExcluded: true });
 	resultEl.classList.remove('visible');
 	clearTimeout(resultTimer);
 }
@@ -345,9 +347,7 @@ function handleSkip() {
 	}
 	resultEl.classList.remove('visible');
 	clearTimeout(resultTimer);
-	rebuildSectors();
-	drawWheel();
-	rotate();
+	resetAndRebuild();
 	if (tot) {
 		angVel = rand(0.25, 0.45);
 		spinEl.classList.remove('spinning');
@@ -410,6 +410,8 @@ resultSkipEl.addEventListener('click', handleSkip);
 window.addEventListener('resize', handleResize);
 
 // History pill click → status modal
+export { getTextColor, getIndex, rebuildSectors, getVariation, handleReshuffle, handleSkip, state };
+
 historyEl.addEventListener('click', (e) => {
 	const btn = e.target.closest('button.history-item');
 	if (!btn) return;

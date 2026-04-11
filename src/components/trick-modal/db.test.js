@@ -81,3 +81,50 @@ describe('clearCustomSelections', () => {
 		expect(loaded).to.equal(null);
 	});
 });
+
+// ---------------------------------------------------------------------------
+// Failure paths — IDB unavailable
+// ---------------------------------------------------------------------------
+
+const origOpen = IDBFactory.prototype.open;
+
+function stubOpenToFail() {
+	const err = new DOMException('Simulated IDB failure');
+	IDBFactory.prototype.open = function () {
+		const req = { error: err };
+		setTimeout(() => { if (req.onerror) req.onerror({ target: req }); }, 0);
+		return req;
+	};
+}
+
+function restoreOpen() {
+	IDBFactory.prototype.open = origOpen;
+}
+
+describe('loadCustomSelections — IDB failure', () => {
+	beforeEach(stubOpenToFail);
+	afterEach(restoreOpen);
+
+	it('returns fallback object', async () => {
+		const result = await loadCustomSelections();
+		expect(result).to.deep.equal({ tricks: [], variations: [], enabled: false });
+	});
+});
+
+describe('saveCustomSelections — IDB failure', () => {
+	beforeEach(stubOpenToFail);
+	afterEach(restoreOpen);
+
+	it('does not throw', async () => {
+		await saveCustomSelections({ tricks: ['Frontside'], variations: [], variationsEnabled: false, history: [] });
+	});
+});
+
+describe('clearCustomSelections — IDB failure', () => {
+	beforeEach(stubOpenToFail);
+	afterEach(restoreOpen);
+
+	it('does not throw', async () => {
+		await clearCustomSelections();
+	});
+});
