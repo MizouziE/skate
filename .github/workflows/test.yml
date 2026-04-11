@@ -1,4 +1,4 @@
-name: Run Web Test Runner Tests
+name: Tests
 
 on:
   push:
@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  check-skip:
+  check:
     runs-on: ubuntu-latest
     outputs:
       skip: ${{ steps.check.outputs.skip }}
@@ -23,8 +23,8 @@ jobs:
           echo "skip=$([ "$COUNT" -gt 0 ] && echo true || echo false)" >> $GITHUB_OUTPUT
 
   test:
-    needs: check-skip
-    if: needs.check-skip.outputs.skip != 'true'
+    needs: check
+    if: needs.check.outputs.skip != 'true'
     runs-on: ubuntu-latest
 
     steps:
