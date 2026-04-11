@@ -13,7 +13,6 @@ A wheel-of-fortune style spinner web app for randomly selecting skateboard (aggr
 - `src/data/soul-grinds.js` — 14 soul grind tricks
 - `src/data/special-name-grinds.js` — 11 special name grind tricks
 - `src/data/variations.js` — 21 variations (used by variations overlay feature)
-- `src/grabber.js` — Utility scraper (not part of app)
 - `src/components/category-selector/index.js` — checkbox event handling, triggers wheel rebuild
 - `src/components/category-selector/template.js` — HTML template
 - `src/components/trick-modal/index.js` — custom trick selection modal logic
