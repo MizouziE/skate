@@ -109,6 +109,9 @@ const state = {
 	set customVariationsEnabled(v) {
 		customVariationsEnabled = v;
 	},
+	get sectors() {
+		return sectors;
+	},
 	rebuildSectors: () => rebuildSectors(),
 	drawWheel: () => drawWheel(),
 	rotate: () => rotate(),
@@ -180,8 +183,8 @@ function drawWheel() {
 
 // ── Spin logic ─────────────────────────────────────────────────────────────
 
-function getIndex() {
-	return Math.floor(tot - (ang / TAU) * tot) % tot;
+function getIndex(a, t) {
+	return Math.floor(t - (a / TAU) * t) % t;
 }
 
 function getVariation() {
@@ -248,7 +251,7 @@ function showResult(sector) {
 
 function rotate() {
 	if (!tot) return;
-	const sector = sectors[getIndex()];
+	const sector = sectors[getIndex(ang, tot)];
 	canvas.style.transform = `rotate(${ang - PI / 2}rad)`;
 	if (angVel) {
 		spinEl.textContent = sector.label;
@@ -262,7 +265,7 @@ function rotate() {
 function frame() {
 	if (!angVel) {
 		if (wasSpinning && tot) {
-			showResult(sectors[getIndex()]);
+			showResult(sectors[getIndex(ang, tot)]);
 			wasSpinning = false;
 		}
 		return;
@@ -407,6 +410,8 @@ resultSkipEl.addEventListener('click', handleSkip);
 window.addEventListener('resize', handleResize);
 
 // History pill click → status modal
+export { getTextColor, getIndex, rebuildSectors, getVariation, handleReshuffle, handleSkip, state };
+
 historyEl.addEventListener('click', (e) => {
 	const btn = e.target.closest('button.history-item');
 	if (!btn) return;
