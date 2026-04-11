@@ -25,6 +25,12 @@ const modalNextEl = document.querySelector('#modalNext');
 const selectAllEl = document.querySelector('#selectAll');
 const selectNoneEl = document.querySelector('#selectNone');
 const modalCloseEl = document.querySelector('#modalClose');
+const statusModalEl = document.querySelector('#statusModal');
+const statusBackdropEl = document.querySelector('#statusBackdrop');
+const statusTrickLabelEl = document.querySelector('#statusTrickLabel');
+const btnLandedEl = document.querySelector('#btnLanded');
+const btnMissedEl = document.querySelector('#btnMissed');
+const btnSkipEl = document.querySelector('#btnSkip');
 
 const PI = Math.PI;
 const TAU = 2 * PI;
@@ -50,6 +56,7 @@ let resizeTimer = null;
 let excluded = new Set();
 let lastLanded = null;
 let sessionHistory = [];
+let statusModalIdx = -1;
 
 // Custom mode state
 let customMode = false;
@@ -147,16 +154,22 @@ function getVariation() {
 }
 
 function addToHistory(label, color) {
-  sessionHistory.unshift({ label, color });
+  sessionHistory.unshift({ label, color, status: null });
   if (sessionHistory.length > MAX_HISTORY) sessionHistory.pop();
   renderHistory();
 }
 
 function renderHistory() {
   if (!sessionHistory.length) { historyEl.innerHTML = ''; return; }
-  historyEl.innerHTML = sessionHistory.map((h, i) =>
-    `<div class="history-item" style="background:${h.color};color:${getTextColor(h.color)};opacity:${1 - i * 0.15}">${h.label}</div>`
-  ).join('');
+  historyEl.innerHTML = sessionHistory.map((h, i) => {
+    const baseOpacity = 1 - i * 0.15;
+    const opacity = h.status === 'skipped' ? baseOpacity * 0.5 : baseOpacity;
+    const skippedClass = h.status === 'skipped' ? ' skipped' : '';
+    const badge = h.status === 'landed' ? '<span class="pill-status landed">✓</span>'
+                : h.status === 'missed'  ? '<span class="pill-status missed">✗</span>'
+                : '';
+    return `<button class="history-item${skippedClass}" data-idx="${i}" style="background:${h.color};color:${getTextColor(h.color)};opacity:${opacity}">${h.label}${badge}</button>`;
+  }).join('');
 }
 
 function showResult(sector) {
@@ -268,6 +281,11 @@ function handleReshuffle() {
 function handleSkip() {
   if (!lastLanded) return;
   excluded.add(lastLanded);
+  if (sessionHistory.length) {
+    sessionHistory[0].status = 'skipped';
+    renderHistory();
+    saveWithHistory();
+  }
   resultEl.classList.remove('visible');
   clearTimeout(resultTimer);
   rebuildSectors();
@@ -445,6 +463,7 @@ async function handleModalSave() {
     tricks: [...modalDraft.tricks],
     variations: [...modalDraft.variations],
     variationsEnabled: modalDraft.variationsEnabled,
+    history: sessionHistory,
   };
   await saveCustomSelections(record);
   applyCustomMode(record);
@@ -466,6 +485,40 @@ async function handleClearCustom() {
   rotate();
 }
 
+// ── Status modal ───────────────────────────────────────────────────────────
+
+function saveWithHistory() {
+  if (!customMode) return;
+  saveCustomSelections({
+    tricks: customTricks.map(t => t.label),
+    variations: customVariations.map(v => v.label),
+    variationsEnabled: customVariationsEnabled,
+    history: sessionHistory,
+  });
+}
+
+function openStatusModal(idx) {
+  statusModalIdx = idx;
+  const h = sessionHistory[idx];
+  statusTrickLabelEl.textContent = h.label;
+  statusTrickLabelEl.style.background = h.color;
+  statusTrickLabelEl.style.color = getTextColor(h.color);
+  statusModalEl.hidden = false;
+}
+
+function closeStatusModal() {
+  statusModalEl.hidden = true;
+  statusModalIdx = -1;
+}
+
+function applyStatus(status) {
+  if (statusModalIdx < 0) return;
+  sessionHistory[statusModalIdx].status = status;
+  renderHistory();
+  saveWithHistory();
+  closeStatusModal();
+}
+
 // ── Boot ───────────────────────────────────────────────────────────────────
 
 setCanvasSize();
@@ -473,7 +526,13 @@ engine();
 
 // Load custom selections from IndexedDB before first render
 loadCustomSelections().then(record => {
-  if (record) applyCustomMode(record);
+  if (record) {
+    applyCustomMode(record);
+    if (record.history?.length) {
+      sessionHistory = record.history.slice(0, MAX_HISTORY);
+      renderHistory();
+    }
+  }
   rebuildSectors();
   drawWheel();
   rotate();
@@ -535,3 +594,22 @@ selectNoneEl.addEventListener('click', () => {
   page.data.forEach(item => set.delete(item.label));
   modalListEl.querySelectorAll('.modal-item-cb').forEach(cb => { cb.checked = false; });
 });
+
+// History pill click → status modal
+historyEl.addEventListener('click', e => {
+  const btn = e.target.closest('button.history-item');
+  if (!btn) return;
+  openStatusModal(Number(btn.dataset.idx));
+});
+
+// Result banner tap → status modal
+resultEl.addEventListener('click', e => {
+  if (e.target === resultSkipEl || resultSkipEl.contains(e.target)) return;
+  if (sessionHistory.length) openStatusModal(0);
+});
+
+// Status modal
+statusBackdropEl.addEventListener('click', closeStatusModal);
+btnLandedEl.addEventListener('click', () => applyStatus('landed'));
+btnMissedEl.addEventListener('click', () => applyStatus('missed'));
+btnSkipEl.addEventListener('click', () => applyStatus('skipped'));
