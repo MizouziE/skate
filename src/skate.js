@@ -1,20 +1,20 @@
-import { grooveGrinds } from './src/data/groove-grinds.js';
-import { soulGrinds } from './src/data/soul-grinds.js';
-import { specialNameGrinds } from './src/data/special-name-grinds.js';
-import { variations } from './src/data/variations.js';
+import { grooveGrinds } from './data/groove-grinds.js';
+import { soulGrinds } from './data/soul-grinds.js';
+import { specialNameGrinds } from './data/special-name-grinds.js';
+import { variations } from './data/variations.js';
 
-import { categorySelectorTemplate } from './src/components/category-selector/template.js';
-import { trickModalTemplate } from './src/components/trick-modal/template.js';
-import { statusModalTemplate } from './src/components/status-modal/template.js';
+import { categorySelectorTemplate } from './components/category-selector/template.js';
+import { trickModalTemplate } from './components/trick-modal/template.js';
+import { statusModalTemplate } from './components/status-modal/template.js';
 
-import { initCategorySelector } from './src/components/category-selector/index.js';
+import { initCategorySelector } from './components/category-selector/index.js';
 import {
 	initTrickModal,
 	loadCustomSelections,
 	saveCustomSelections,
 	applyCustomMode,
-} from './src/components/trick-modal/index.js';
-import { initStatusModal } from './src/components/status-modal/index.js';
+} from './components/trick-modal/index.js';
+import { initStatusModal } from './components/status-modal/index.js';
 
 // Inject component templates before querying any of their elements
 document

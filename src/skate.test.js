@@ -1,7 +1,7 @@
 import { expect } from '@esm-bundle/chai';
-import { grooveGrinds } from './src/data/groove-grinds.js';
-import { soulGrinds } from './src/data/soul-grinds.js';
-import { variations } from './src/data/variations.js';
+import { grooveGrinds } from './data/groove-grinds.js';
+import { soulGrinds } from './data/soul-grinds.js';
+import { variations } from './data/variations.js';
 
 // ---------------------------------------------------------------------------
 // Minimal DOM — must exist before skate.js initialises
