@@ -1,0 +1,296 @@
+/* Wheel */
+#wheelOfFortune {
+	position: relative;
+	display: inline-block;
+	animation: fadeUp 0.5s ease-out both;
+}
+
+#wheel {
+	display: block;
+	border-radius: 50%;
+	box-shadow:
+		0 0 0 4px #333,
+		0 8px 48px rgba(0, 0, 0, 0.8);
+}
+
+/* Spin button */
+#spin {
+	font-family:
+		system-ui,
+		-apple-system,
+		sans-serif;
+	font-weight: 900;
+	font-size: clamp(0.55rem, 3.5vw, 0.9rem);
+	line-height: 1.2;
+	user-select: none;
+	cursor: pointer;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	text-align: center;
+	padding: 6px;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	width: 30%;
+	height: 30%;
+	margin: -15%;
+	background: #222;
+	color: #fff;
+	box-shadow:
+		0 0 0 6px currentColor,
+		0 4px 20px rgba(0, 0, 0, 0.6);
+	border-radius: 50%;
+	transition: background 0.6s;
+	word-break: break-word;
+	hyphens: auto;
+	-webkit-tap-highlight-color: transparent;
+}
+
+#spin::after {
+	content: '';
+	position: absolute;
+	top: -16px;
+	border: 9px solid transparent;
+	border-bottom-color: currentColor;
+	border-top: none;
+}
+
+#spin.spinning {
+	animation: pulse 0.4s ease-out;
+}
+
+@keyframes pulse {
+	0% {
+		transform: scale(1);
+	}
+	50% {
+		transform: scale(1.14);
+	}
+	100% {
+		transform: scale(1);
+	}
+}
+
+/* Result banner */
+#result {
+	width: 100%;
+	max-width: 480px;
+	max-height: 0;
+	overflow: hidden;
+	opacity: 0;
+	border-radius: 12px;
+	font-size: clamp(1rem, 4vw, 1.15rem);
+	font-weight: 800;
+	letter-spacing: 0.04em;
+	text-align: center;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 12px;
+	transition:
+		max-height 0.35s ease,
+		opacity 0.3s ease,
+		padding 0.35s ease;
+	pointer-events: none;
+}
+
+#result.visible {
+	max-height: 120px;
+	opacity: 1;
+	padding: 14px 16px;
+	pointer-events: auto;
+	cursor: pointer;
+}
+
+#result.visible:active {
+	filter: brightness(0.88);
+}
+
+#result-text {
+	flex: 1;
+	min-width: 0;
+}
+
+#result-skip {
+	background: transparent;
+	border: 2px solid currentColor;
+	color: inherit;
+	border-radius: 20px;
+	padding: 6px 14px;
+	font-family:
+		system-ui,
+		-apple-system,
+		sans-serif;
+	font-size: 0.7rem;
+	font-weight: 800;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	cursor: pointer;
+	white-space: nowrap;
+	flex-shrink: 0;
+	-webkit-tap-highlight-color: transparent;
+	transition: opacity 0.15s;
+}
+
+#result-skip:active {
+	opacity: 0.6;
+}
+
+/* Reshuffle button */
+#reshuffle {
+	background: transparent;
+	border: 1px solid #444;
+	color: #888;
+	border-radius: 20px;
+	padding: 10px 28px;
+	font-family:
+		system-ui,
+		-apple-system,
+		sans-serif;
+	font-size: 0.75rem;
+	font-weight: 700;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+	cursor: pointer;
+	transition:
+		color 0.15s,
+		border-color 0.15s;
+	-webkit-tap-highlight-color: transparent;
+}
+
+#reshuffle:active {
+	color: #ccc;
+	border-color: #666;
+}
+
+/* Session history */
+#history {
+	width: 100%;
+	max-width: 480px;
+	display: flex;
+	flex-direction: row;
+	gap: 6px;
+	overflow-x: auto;
+	padding-bottom: 4px;
+	scrollbar-width: none;
+}
+
+#history::-webkit-scrollbar {
+	display: none;
+}
+
+.history-item {
+	padding: 6px 12px;
+	border-radius: 16px;
+	font-size: 0.78rem;
+	font-weight: 700;
+	white-space: nowrap;
+	flex-shrink: 0;
+	letter-spacing: 0.03em;
+	border: none;
+	cursor: pointer;
+	-webkit-tap-highlight-color: transparent;
+	transition: filter 0.12s;
+	font-family:
+		system-ui,
+		-apple-system,
+		sans-serif;
+}
+
+.history-item:active {
+	filter: brightness(0.8);
+}
+
+.history-item.skipped {
+	text-decoration: line-through;
+}
+
+.pill-status {
+	margin-left: 5px;
+	font-size: 0.9em;
+	font-weight: 900;
+}
+
+.pill-status.landed {
+	color: #5dde6a;
+}
+.pill-status.missed {
+	color: #ff6b5b;
+}
+
+@keyframes fadeUp {
+	from {
+		opacity: 0;
+		transform: translateY(24px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+/* Customize button */
+#customizeBtn {
+	background: transparent;
+	border: 1px solid #444;
+	color: #888;
+	border-radius: 20px;
+	padding: 10px 28px;
+	font-family:
+		system-ui,
+		-apple-system,
+		sans-serif;
+	font-size: 0.75rem;
+	font-weight: 700;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+	cursor: pointer;
+	transition:
+		color 0.15s,
+		border-color 0.15s;
+	-webkit-tap-highlight-color: transparent;
+}
+
+#customizeBtn:active {
+	color: #ccc;
+	border-color: #666;
+}
+
+/* Custom mode bar */
+#customModeBar {
+	width: 100%;
+	max-width: 480px;
+	text-align: center;
+	font-size: 0.8rem;
+	font-weight: 600;
+	color: #aaa;
+	letter-spacing: 0.05em;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 10px;
+}
+
+#clearCustom {
+	background: transparent;
+	border: 1px solid #555;
+	color: #e83d44;
+	border-radius: 12px;
+	padding: 4px 12px;
+	font-family:
+		system-ui,
+		-apple-system,
+		sans-serif;
+	font-size: 0.72rem;
+	font-weight: 700;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	cursor: pointer;
+	-webkit-tap-highlight-color: transparent;
+	transition: opacity 0.15s;
+}
+
+#clearCustom:active {
+	opacity: 0.6;
+}
