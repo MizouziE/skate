@@ -1,12 +1,13 @@
 name: Run Web Test Runner Tests
 
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - main
   pull_request:
     branches:
       - main
-    paths-ignore:
-      - '**.md'
+  workflow_dispatch:
 
 jobs:
   test:
