@@ -11,6 +11,20 @@ const resultTextEl = document.querySelector('#result-text');
 const resultSkipEl = document.querySelector('#result-skip');
 const reshuffleEl = document.querySelector('#reshuffle');
 const historyEl = document.querySelector('#history');
+const customizeBtnEl = document.querySelector('#customizeBtn');
+const customModeBarEl = document.querySelector('#customModeBar');
+const clearCustomEl = document.querySelector('#clearCustom');
+const trickModalEl = document.querySelector('#trickModal');
+const modalBackdropEl = document.querySelector('#modalBackdrop');
+const modalTitleEl = document.querySelector('#modalTitle');
+const modalPageEl = document.querySelector('#modalPage');
+const modalListEl = document.querySelector('#modalList');
+const modalErrorEl = document.querySelector('#modalError');
+const modalPrevEl = document.querySelector('#modalPrev');
+const modalNextEl = document.querySelector('#modalNext');
+const selectAllEl = document.querySelector('#selectAll');
+const selectNoneEl = document.querySelector('#selectNone');
+const modalCloseEl = document.querySelector('#modalClose');
 
 const PI = Math.PI;
 const TAU = 2 * PI;
@@ -36,6 +50,23 @@ let resizeTimer = null;
 let excluded = new Set();
 let lastLanded = null;
 let sessionHistory = [];
+
+// Custom mode state
+let customMode = false;
+let customTricks = [];   // in-memory copy of saved trick objects
+let customVariations = []; // in-memory copy of saved variation objects
+let customVariationsEnabled = false;
+
+// Modal state
+let modalPage = 0;
+let modalDraft = { tricks: new Set(), variations: new Set(), variationsEnabled: false };
+
+const MODAL_PAGES = [
+  { title: 'Groove Grinds',       data: grooveGrinds },
+  { title: 'Soul Grinds',         data: soulGrinds },
+  { title: 'Special Name Grinds', data: specialNameGrinds },
+  { title: 'Variations',          data: variations, isVariations: true },
+];
 
 // ── Canvas sizing ──────────────────────────────────────────────────────────
 
@@ -104,6 +135,11 @@ function getIndex() {
 }
 
 function getVariation() {
+  if (customMode) {
+    if (!customVariationsEnabled || customVariations.length === 0) return null;
+    const valid = customVariations.filter(v => v.color && v.color.length >= 7);
+    return valid[Math.floor(Math.random() * valid.length)] ?? null;
+  }
   const toggle = document.getElementById('variations-toggle');
   if (!toggle?.checked) return null;
   const valid = variations.filter(v => v.color && v.color.length >= 7);
@@ -184,9 +220,13 @@ function engine() {
 
 function rebuildSectors(tempExclude = null) {
   let pool = [];
-  document.querySelectorAll('#listSelector input[type="checkbox"]').forEach(cb => {
-    if (cb.checked && listMap[cb.name]) pool.push(...listMap[cb.name]);
-  });
+  if (customMode) {
+    pool = [...customTricks];
+  } else {
+    document.querySelectorAll('#listSelector input[type="checkbox"]').forEach(cb => {
+      if (cb.checked && listMap[cb.name]) pool.push(...listMap[cb.name]);
+    });
+  }
 
   // Filter out user-skipped tricks
   let filtered = pool.filter(t => !excluded.has(t.label));
@@ -250,19 +290,205 @@ function handleResize() {
   }, 150);
 }
 
+// ── IndexedDB ──────────────────────────────────────────────────────────────
+
+function openDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open('skateDB', 1);
+    req.onupgradeneeded = e => {
+      e.target.result.createObjectStore('userSelections', { keyPath: 'id' });
+    };
+    req.onsuccess = e => resolve(e.target.result);
+    req.onerror = e => reject(e.target.error);
+  });
+}
+
+async function loadCustomSelections() {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction('userSelections', 'readonly');
+    const req = tx.objectStore('userSelections').get('main');
+    req.onsuccess = e => resolve(e.target.result ?? null);
+    req.onerror = e => reject(e.target.error);
+  });
+}
+
+async function saveCustomSelections(data) {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction('userSelections', 'readwrite');
+    const req = tx.objectStore('userSelections').put({ id: 'main', ...data });
+    req.onsuccess = () => resolve();
+    req.onerror = e => reject(e.target.error);
+  });
+}
+
+async function clearCustomSelections() {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction('userSelections', 'readwrite');
+    const req = tx.objectStore('userSelections').delete('main');
+    req.onsuccess = () => resolve();
+    req.onerror = e => reject(e.target.error);
+  });
+}
+
+// ── Custom mode helpers ────────────────────────────────────────────────────
+
+function applyCustomMode(record) {
+  // Resolve trick objects from saved labels
+  const allTricks = [...grooveGrinds, ...soulGrinds, ...specialNameGrinds];
+  customTricks = allTricks.filter(t => record.tricks.includes(t.label));
+  customVariations = variations.filter(v => record.variations.includes(v.label));
+  customVariationsEnabled = record.variationsEnabled;
+
+  customMode = true;
+  customModeBarEl.hidden = false;
+  document.querySelector('#listSelector').classList.add('disabled');
+  document.querySelector('#variations-toggle').disabled = true;
+}
+
+function disableCustomMode() {
+  customMode = false;
+  customTricks = [];
+  customVariations = [];
+  customVariationsEnabled = false;
+  customModeBarEl.hidden = true;
+  document.querySelector('#listSelector').classList.remove('disabled');
+  document.querySelector('#variations-toggle').disabled = false;
+}
+
+// ── Modal ──────────────────────────────────────────────────────────────────
+
+function openModal() {
+  // Populate draft from current custom selection (or blank)
+  if (customMode) {
+    modalDraft.tricks = new Set(customTricks.map(t => t.label));
+    modalDraft.variations = new Set(customVariations.map(v => v.label));
+    modalDraft.variationsEnabled = customVariationsEnabled;
+  } else {
+    modalDraft.tricks = new Set();
+    modalDraft.variations = new Set();
+    modalDraft.variationsEnabled = false;
+  }
+  modalPage = 0;
+  trickModalEl.hidden = false;
+  document.body.style.overflow = 'hidden';
+  renderModalPage(modalPage);
+}
+
+function closeModal() {
+  trickModalEl.hidden = true;
+  document.body.style.overflow = '';
+  modalErrorEl.hidden = true;
+}
+
+function renderModalPage(i) {
+  const page = MODAL_PAGES[i];
+  modalTitleEl.textContent = page.title;
+  modalPageEl.textContent = `(${i + 1}/${MODAL_PAGES.length})`;
+
+  // Prev button visibility
+  modalPrevEl.style.visibility = i === 0 ? 'hidden' : 'visible';
+
+  // Next/Save label
+  modalNextEl.textContent = i === MODAL_PAGES.length - 1 ? 'Save' : 'Next →';
+
+  // Build list
+  let html = '';
+
+  if (page.isVariations) {
+    const checked = modalDraft.variationsEnabled ? 'checked' : '';
+    html += `<label class="modal-toggle-label">
+      <input type="checkbox" id="varToggle" class="modal-var-toggle" ${checked}>
+      Apply a variation to each result
+    </label>`;
+  }
+
+  html += page.data.map(item => {
+    const set = page.isVariations ? modalDraft.variations : modalDraft.tricks;
+    const checked = set.has(item.label) ? 'checked' : '';
+    return `<label class="modal-item-label">
+      <input type="checkbox" class="modal-item-cb" data-label="${item.label}" ${checked}>
+      <span class="modal-item-dot" style="background:${item.color}"></span>
+      ${item.label}
+    </label>`;
+  }).join('');
+
+  modalListEl.innerHTML = html;
+  modalListEl.scrollTop = 0;
+  modalErrorEl.hidden = true;
+
+  // Wire variation toggle
+  if (page.isVariations) {
+    modalListEl.querySelector('#varToggle').addEventListener('change', e => {
+      modalDraft.variationsEnabled = e.target.checked;
+    });
+  }
+
+  // Wire item checkboxes
+  modalListEl.querySelectorAll('.modal-item-cb').forEach(cb => {
+    cb.addEventListener('change', e => {
+      const set = page.isVariations ? modalDraft.variations : modalDraft.tricks;
+      if (e.target.checked) set.add(e.target.dataset.label);
+      else set.delete(e.target.dataset.label);
+    });
+  });
+}
+
+async function handleModalSave() {
+  if (modalDraft.tricks.size === 0) {
+    modalErrorEl.hidden = false;
+    return;
+  }
+  const record = {
+    tricks: [...modalDraft.tricks],
+    variations: [...modalDraft.variations],
+    variationsEnabled: modalDraft.variationsEnabled,
+  };
+  await saveCustomSelections(record);
+  applyCustomMode(record);
+  closeModal();
+  excluded.clear();
+  lastLanded = null;
+  rebuildSectors();
+  drawWheel();
+  rotate();
+}
+
+async function handleClearCustom() {
+  await clearCustomSelections();
+  disableCustomMode();
+  excluded.clear();
+  lastLanded = null;
+  rebuildSectors();
+  drawWheel();
+  rotate();
+}
+
 // ── Boot ───────────────────────────────────────────────────────────────────
 
 setCanvasSize();
-rebuildSectors();
-drawWheel();
-rotate();
 engine();
+
+// Load custom selections from IndexedDB before first render
+loadCustomSelections().then(record => {
+  if (record) applyCustomMode(record);
+  rebuildSectors();
+  drawWheel();
+  rotate();
+}).catch(() => {
+  rebuildSectors();
+  drawWheel();
+  rotate();
+});
 
 spinEl.addEventListener('click', handleSpin);
 reshuffleEl.addEventListener('click', handleReshuffle);
 resultSkipEl.addEventListener('click', handleSkip);
 window.addEventListener('resize', handleResize);
 
+// Category checkboxes
 document.querySelectorAll('#listSelector input[type="checkbox"]').forEach(input => {
   input.addEventListener('change', () => {
     if (!listMap[input.name]) return; // variations-toggle — no rebuild needed
@@ -272,4 +498,40 @@ document.querySelectorAll('#listSelector input[type="checkbox"]').forEach(input 
     if (tot) drawWheel();
     rotate();
   });
+});
+
+// Modal event listeners
+customizeBtnEl.addEventListener('click', openModal);
+clearCustomEl.addEventListener('click', handleClearCustom);
+modalCloseEl.addEventListener('click', closeModal);
+modalBackdropEl.addEventListener('click', closeModal);
+
+modalPrevEl.addEventListener('click', () => {
+  if (modalPage > 0) {
+    modalPage--;
+    renderModalPage(modalPage);
+  }
+});
+
+modalNextEl.addEventListener('click', () => {
+  if (modalPage < MODAL_PAGES.length - 1) {
+    modalPage++;
+    renderModalPage(modalPage);
+  } else {
+    handleModalSave();
+  }
+});
+
+selectAllEl.addEventListener('click', () => {
+  const page = MODAL_PAGES[modalPage];
+  const set = page.isVariations ? modalDraft.variations : modalDraft.tricks;
+  page.data.forEach(item => set.add(item.label));
+  modalListEl.querySelectorAll('.modal-item-cb').forEach(cb => { cb.checked = true; });
+});
+
+selectNoneEl.addEventListener('click', () => {
+  const page = MODAL_PAGES[modalPage];
+  const set = page.isVariations ? modalDraft.variations : modalDraft.tricks;
+  page.data.forEach(item => set.delete(item.label));
+  modalListEl.querySelectorAll('.modal-item-cb').forEach(cb => { cb.checked = false; });
 });
