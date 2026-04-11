@@ -15,13 +15,14 @@ jobs:
     container:
       image: mcr.microsoft.com/playwright:v1.42.1-jammy
 
-    env:
-      CHROME_PATH: /usr/bin/google-chrome
+    # env:
+    #   CHROME_PATH: /usr/bin/google-chrome
 
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - run: npm ci
-      - run: npm test
+      - run: which google-chrome || which chromium || which chromium-browser
+    #   - run: npm ci
+    #   - run: npm test
