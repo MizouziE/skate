@@ -1,0 +1,21 @@
+name: Run Web Test Runner Tests
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+    paths-ignore:
+      - '**.md'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    container:
+      image: cypress/browsers:node20.9.0-chrome118
+
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm ci
+      - run: npm test
