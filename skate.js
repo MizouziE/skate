@@ -243,11 +243,7 @@ function showResult(sector) {
 	addToHistory(displayLabel, sector.color);
 
 	// Quietly rebuild wheel while result is visible, excluding what just landed
-	setTimeout(() => {
-		rebuildSectors(sector.label);
-		drawWheel();
-		rotate();
-	}, 400);
+	setTimeout(() => resetAndRebuild({ tempExclude: sector.label }), 400);
 }
 
 function rotate() {
@@ -315,6 +311,13 @@ function rebuildSectors(tempExclude = null) {
 
 // ── Event handlers ─────────────────────────────────────────────────────────
 
+function resetAndRebuild({ clearExcluded = false, tempExclude = null } = {}) {
+	if (clearExcluded) { excluded.clear(); lastLanded = null; }
+	rebuildSectors(tempExclude);
+	drawWheel();
+	rotate();
+}
+
 function handleSpin() {
 	if (!angVel && tot) {
 		angVel = rand(0.25, 0.45);
@@ -326,11 +329,7 @@ function handleSpin() {
 }
 
 function handleReshuffle() {
-	excluded.clear();
-	lastLanded = null;
-	rebuildSectors();
-	drawWheel();
-	rotate();
+	resetAndRebuild({ clearExcluded: true });
 	resultEl.classList.remove('visible');
 	clearTimeout(resultTimer);
 }
@@ -345,9 +344,7 @@ function handleSkip() {
 	}
 	resultEl.classList.remove('visible');
 	clearTimeout(resultTimer);
-	rebuildSectors();
-	drawWheel();
-	rotate();
+	resetAndRebuild();
 	if (tot) {
 		angVel = rand(0.25, 0.45);
 		spinEl.classList.remove('spinning');
