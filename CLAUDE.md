@@ -2,11 +2,11 @@
 
 ## Project Overview
 
-A wheel-of-fortune style spinner web app for randomly selecting bladeboard (aggressive inline) grind tricks. Built with vanilla JS, HTML Canvas, and CSS. No build step required — ES modules loaded natively. Open `blade.html` via a local server (e.g. VS Code Live Server).
+A wheel-of-fortune style spinner web app for randomly selecting bladeboard (aggressive inline) grind tricks. Built with vanilla JS, HTML Canvas, and CSS. No build step required — ES modules loaded natively. Open `index.html` via a local server (e.g. VS Code Live Server).
 
 ## Key Files
 
-- `blade.html` — Main HTML page
+- `index.html` — Main HTML page
 - `blade.js` — Wheel logic, spin engine, UI event handling
 - `src/blade.css` — All styling
 - `src/data/groove-grinds.js` — 24 groove grind tricks

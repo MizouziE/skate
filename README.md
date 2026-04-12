@@ -41,7 +41,7 @@ Tick any combination of categories — the wheel always fills to 12.
 ## How it works
 
 ```
-blade.html          ← single page, no framework
+index.html          ← single page, no framework
 blade.js            ← wheel engine, spin physics, state, UI event handling
 src/blade.css       ← all styles: dark theme, animations, responsive layout
 src/data/
@@ -85,7 +85,7 @@ If filtering leaves fewer than 3 candidates, the full pool is used as fallback s
 No build step needed — the app uses native ES modules.
 
 1. Clone the repo
-2. Open `blade.html` via any local server
+2. Open `index.html` via any local server
 
 ```bash
 # e.g. with the VS Code Live Server extension, or:
