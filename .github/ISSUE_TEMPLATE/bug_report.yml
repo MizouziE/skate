@@ -1,0 +1,52 @@
+name: Bug report
+description: Something not working right
+labels: ["bug"]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Describe the bug
+      placeholder: What happened?
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Open the app
+        2. Select categories ...
+        3. Spin ...
+        4. See error
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behaviour
+      placeholder: What should have happened?
+    validations:
+      required: true
+
+  - type: dropdown
+    id: device
+    attributes:
+      label: Device / browser
+      options:
+        - iOS Safari
+        - Android Chrome
+        - Desktop Chrome
+        - Desktop Firefox
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      placeholder: Screenshots, console errors, anything else useful
+    validations:
+      required: false
