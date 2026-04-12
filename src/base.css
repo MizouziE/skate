@@ -54,6 +54,24 @@ body {
 	color: #e8e8e8;
 }
 
+footer {
+	margin-top: auto;
+}
+
+#about-link {
+	color: #555;
+	text-decoration: none;
+	font-size: 0.75rem;
+	font-weight: 600;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	transition: color 0.15s;
+}
+
+#about-link:hover {
+	color: #888;
+}
+
 header h1 {
 	font-size: clamp(1.3rem, 6vw, 2rem);
 	font-weight: 900;
