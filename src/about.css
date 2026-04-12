@@ -1,0 +1,89 @@
+#about {
+	width: 100%;
+	max-width: 480px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 28px;
+	text-align: center;
+}
+
+.about-tagline {
+	font-size: clamp(1.1rem, 5vw, 1.4rem);
+	font-weight: 800;
+	color: #fff;
+	letter-spacing: 0.02em;
+}
+
+.about-desc {
+	font-size: 0.95rem;
+	color: #aaa;
+	line-height: 1.6;
+}
+
+.about-section {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 10px;
+}
+
+.about-section h2 {
+	font-size: 0.7rem;
+	font-weight: 700;
+	letter-spacing: 0.15em;
+	text-transform: uppercase;
+	color: #555;
+}
+
+.about-section p {
+	font-size: 0.95rem;
+	color: #ccc;
+	line-height: 1.6;
+}
+
+.about-steps {
+	list-style: none;
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+
+.about-steps li {
+	font-size: 0.95rem;
+	color: #ccc;
+	line-height: 1.5;
+}
+
+.about-section a:not(.github-btn) {
+	color: #e83d44;
+	text-decoration: none;
+}
+
+.about-section a:not(.github-btn):hover {
+	text-decoration: underline;
+}
+
+.github-btn {
+	display: inline-flex;
+	align-items: center;
+	gap: 10px;
+	background: transparent;
+	border: 1px solid #444;
+	color: #ccc;
+	border-radius: 20px;
+	padding: 10px 20px;
+	font-size: 0.85rem;
+	font-weight: 700;
+	letter-spacing: 0.08em;
+	text-decoration: none;
+	transition:
+		color 0.15s,
+		border-color 0.15s;
+	align-self: center;
+}
+
+.github-btn:hover {
+	color: #fff;
+	border-color: #888;
+}
