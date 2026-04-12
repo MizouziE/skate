@@ -2,7 +2,7 @@
 
 function openDB() {
 	return new Promise((resolve, reject) => {
-		const req = indexedDB.open('skateDB', 1);
+		const req = indexedDB.open('bladeDB', 1);
 		req.onupgradeneeded = (e) => {
 			e.target.result.createObjectStore('userSelections', { keyPath: 'id' });
 		};

@@ -28,7 +28,7 @@ function applyStatus(state, status) {
 }
 
 export function initStatusModal(state) {
-	// Expose openStatusModal via state for skate.js event listeners
+	// Expose openStatusModal via state for blade.js event listeners
 	state.openStatusModal = (idx) => openStatusModal(state, idx);
 
 	document

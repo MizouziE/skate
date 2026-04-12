@@ -4,7 +4,7 @@ import { soulGrinds } from './data/soul-grinds.js';
 import { variations } from './data/variations.js';
 
 // ---------------------------------------------------------------------------
-// Minimal DOM — must exist before skate.js initialises
+// Minimal DOM — must exist before blade.js initialises
 // ---------------------------------------------------------------------------
 
 const host = document.createElement('div');
@@ -25,12 +25,26 @@ document.body.appendChild(host);
 // Dynamic import — deferred so DOM is ready first
 // ---------------------------------------------------------------------------
 
-let getTextColor, getIndex, rebuildSectors, getVariation, handleReshuffle, handleSkip, state;
+let getTextColor,
+	getIndex,
+	rebuildSectors,
+	getVariation,
+	handleReshuffle,
+	handleSkip,
+	state;
 const TAU = 2 * Math.PI;
 
 before(async () => {
-	const mod = await import('./skate.js');
-	({ getTextColor, getIndex, rebuildSectors, getVariation, handleReshuffle, handleSkip, state } = mod);
+	const mod = await import('./blade.js');
+	({
+		getTextColor,
+		getIndex,
+		rebuildSectors,
+		getVariation,
+		handleReshuffle,
+		handleSkip,
+		state,
+	} = mod);
 	// Allow loadCustomSelections() to settle
 	await new Promise((r) => setTimeout(r, 50));
 });
@@ -107,7 +121,9 @@ describe('rebuildSectors — standard mode', () => {
 		document.querySelector('input[name="groove-grinds"]').checked = false;
 		rebuildSectors();
 		const grooveLabels = new Set(grooveGrinds.map((t) => t.label));
-		expect(state.sectors.every((s) => !grooveLabels.has(s.label))).to.equal(true);
+		expect(state.sectors.every((s) => !grooveLabels.has(s.label))).to.equal(
+			true
+		);
 	});
 
 	it('excluded label absent from sectors', () => {
@@ -143,7 +159,9 @@ describe('rebuildSectors — custom mode', () => {
 	it('uses customTricks instead of category pools', () => {
 		rebuildSectors();
 		const customLabels = new Set(customPool.map((t) => t.label));
-		expect(state.sectors.every((s) => customLabels.has(s.label))).to.equal(true);
+		expect(state.sectors.every((s) => customLabels.has(s.label))).to.equal(
+			true
+		);
 	});
 
 	it('tot equals customTricks length when below TARGET_COUNT', () => {

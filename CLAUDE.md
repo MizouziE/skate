@@ -1,14 +1,14 @@
-# Skate Trick Spinner
+# blade Trick Spinner
 
 ## Project Overview
 
-A wheel-of-fortune style spinner web app for randomly selecting skateboard (aggressive inline) grind tricks. Built with vanilla JS, HTML Canvas, and CSS. No build step required — ES modules loaded natively. Open `skate.html` via a local server (e.g. VS Code Live Server).
+A wheel-of-fortune style spinner web app for randomly selecting bladeboard (aggressive inline) grind tricks. Built with vanilla JS, HTML Canvas, and CSS. No build step required — ES modules loaded natively. Open `blade.html` via a local server (e.g. VS Code Live Server).
 
 ## Key Files
 
-- `skate.html` — Main HTML page
-- `skate.js` — Wheel logic, spin engine, UI event handling
-- `src/skate.css` — All styling
+- `blade.html` — Main HTML page
+- `blade.js` — Wheel logic, spin engine, UI event handling
+- `src/blade.css` — All styling
 - `src/data/groove-grinds.js` — 24 groove grind tricks
 - `src/data/soul-grinds.js` — 14 soul grind tricks
 - `src/data/special-name-grinds.js` — 11 special name grind tricks
@@ -31,7 +31,7 @@ A wheel-of-fortune style spinner web app for randomly selecting skateboard (aggr
 - Custom trick mode — modal lets user hand-pick tricks and variations; persisted via IndexedDB
 - Session history — last 5 tricks as colored pills with landed/missed/skipped status badges; click to update status
 
-## Key State (skate.js)
+## Key State (blade.js)
 
 - `excluded` — `Set` of trick labels the user has skipped; cleared on reshuffle/category change
 - `lastLanded` — base trick label of the most recent result; used as `tempExclude` in next rebuild
